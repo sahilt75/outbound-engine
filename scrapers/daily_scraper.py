@@ -720,9 +720,10 @@ async def run_user_scrape(field: str, country: str, max_users: int, jsonl_file, 
             try:
                 print(f"[{idx}/{len(users_collected)}] Visiting: {profile}")
                 data = await extract_user_data(page, profile, visited)
-                jsonl_file.write(json.dumps(data, ensure_ascii=False) + "\n")
-                users_data.append(data)
-                visited.add(data["username"])   
+                if data:
+                    jsonl_file.write(json.dumps(data, ensure_ascii=False) + "\n")
+                    users_data.append(data)
+                    visited.add(data["username"])
             except Exception as e:
                 print("  (!) Error extracting profile:", e)
                 traceback.print_exc()
