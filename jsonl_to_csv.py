@@ -71,8 +71,8 @@ def write_csv(rows: List[Dict[str, Any]], out_path: str):
 
 
 def main():
-    in_path = "scrapers/data/raw/behance_2025-12-03.jsonl"
-    out_path = "scrapers/data/raw/behance_2025-12-03.csv"
+    in_path = "scrapers/data/raw/behance_2025-12-08.jsonl"
+    out_path = "scrapers/data/raw/behance_2025-12-08.csv"
 
     if not os.path.isfile(in_path):
         print(f"[!] Input JSONL not found: {in_path}")

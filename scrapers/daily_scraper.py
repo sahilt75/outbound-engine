@@ -678,17 +678,21 @@ async def run_user_scrape(field: str, country: str, max_users: int, jsonl_file, 
 
     async with async_playwright() as p:
         browser: Browser = await p.chromium.launch(headless=headless)
-        context = await browser.new_context(user_agent=(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/115.0 Safari/537.36"
-        ))
+        context = await browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/115.0 Safari/537.36"
+            ),
+            storage_state="../behance_state.json"  # use saved logged-in state
+        )
+
         page = await context.new_page()
 
         # Build users search URL
         # Example: https://www.behance.net/search/users?field=web+design&country=IN&userAvailability=isAvailableFullTime
         q = field.replace(" ", "+")
-        search_url = f"https://www.behance.net/search/users?field={q}&country={country}&userAvailability=isAvailableFullTime"
+        search_url = f"https://www.behance.net/search/users?field={q}&country={country}&userAvailability=isAvailableFullTime&sort=appreciations&time=all"
         print("[+] Loading search URL:", search_url)
         await page.goto(search_url, timeout=NAV_TIMEOUT)
         await asyncio.sleep(1.0)
@@ -696,7 +700,7 @@ async def run_user_scrape(field: str, country: str, max_users: int, jsonl_file, 
         # Scroll & collect
         last_count = 0
         attempts = 0
-        while len(users_collected) < max_users and attempts < 40:
+        while len(users_collected) < max_users and attempts < 5:
             await ensure_scroll_load_users(page, timeout=7)
             links = await extract_user_links_from_search(page)
             for link in links:
